@@ -1,15 +1,43 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import VueRouter from 'vue-router'
+import Login from '../views/Login.vue'
+import Accounts from "../views/Accounts";
 
-Vue.use(Vuex)
+Vue.use(VueRouter);
 
-export default new Vuex.Store({
-  state: {
+const ifNotAuthenticated = (to, from, next) => {
+    if (localStorage.getItem('user-token') !== null) {
+        next();
+        return
+    }
+    next('/')
+};
+
+const ifAuthenticated = (to, from, next) => {
+    if (localStorage.getItem('user-token') === null) {
+        next();
+        return
+    }
+    next('/accounts')
+};
+
+const routes = [
+    {
+        path: '/',
+        name: 'login',
+        component: Login,
+        beforeEnter: ifAuthenticated,
+    },
+  {
+    path: '/accounts',
+    name: 'accounts',
+    component: Accounts,
+    beforeEnter: ifNotAuthenticated,
   },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
-})
+];
+
+const router = new VueRouter({
+    routes
+});
+
+export default router
